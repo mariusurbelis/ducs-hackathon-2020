@@ -120,7 +120,31 @@ public class Client {
                     else
                         print(getData(command + " " + username));
                 }
+            } else if (command.split(" ")[0].equalsIgnoreCase("SPY")) {
+                String players = getData("PLAYERS");
+                clearScreen();
+                print("Armies currently in the game:");
+                print(players);
+                print("Your choice: ");
+
+                String chosenPlayer = playerIn.nextLine();
+
+                boolean valid = false;
+
+                for(String s : players.split(" ")) {
+                    if (s.equalsIgnoreCase(chosenPlayer)) {
+                        valid = true;
+                    }
+                }
+
+                if (valid) {
+                    // Spy the player
+                    print(getData(command + " " + username));
+                } else {
+                    print("Player does not exist");
+                }
             }
+
 
             pause();
         }
