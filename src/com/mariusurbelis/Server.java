@@ -10,6 +10,9 @@ import java.util.Scanner;
 
 public class Server {
 
+    Date lastPointsAddedDate = null;
+
+
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
@@ -28,6 +31,55 @@ public class Server {
         }
     }
 
+    public static void refreshPoints() {
+
+
+        for(Player p : players) {
+            p.actionPoints += p.actionPointsPerTime;
+        }
+    }
+
+    public static boolean battle(String attacker, String defender) {
+
+        Player a = null, d = null, b = null;
+
+        for(Player p : players) {
+            if (p.username.equalsIgnoreCase(attacker)) {
+                a = p;
+            } else if (p.username.equalsIgnoreCase(defender)) {
+                d = p;
+            }
+        }
+
+        for(Player p : players) {
+            if (p.username.equalsIgnoreCase(attacker)) {
+                p.infantry -= Math.floor(d.archers * 1.2);
+                p.archers -= Math.floor(d.cavalry * 1.2);
+                p.cavalry -= Math.floor(d.infantry * 1.2);
+                if (p.infantry < 0)
+                    p.infantry = 0;
+                if (p.archers < 0)
+                    p.archers = 0;
+                if (p.cavalry < 0)
+                    p.cavalry = 0;
+                b = p;
+            } else if (p.username.equalsIgnoreCase(defender)) {
+                p.infantry -= Math.floor(a.archers * 1.2);
+                p.archers -= Math.floor(a.cavalry * 1.2);
+                p.cavalry -= Math.floor(a.infantry * 1.2);
+                if (p.infantry < 0)
+                    p.infantry = 0;
+                if (p.archers < 0)
+                    p.archers = 0;
+                if (p.cavalry < 0)
+                    p.cavalry = 0;
+                d = p;
+            }
+        }
+
+        return ((d.infantry + d.archers + d.cavalry) < (b.infantry + b.archers + b.cavalry));
+    }
+
     public static void addPlayer(String name) {
         for (Player p : players) {
             if (p.username.equalsIgnoreCase(name)) {
@@ -35,6 +87,15 @@ public class Server {
             }
         }
         players.add(new Player(name));
+    }
+
+    public static void givePoints(String username, int amount) {
+        for(Player p : players) {
+            if (p.username.equalsIgnoreCase(username)) {
+                p.actionPoints += amount;
+                return;
+            }
+        }
     }
 
     public static String playerStats(String username) {
@@ -81,6 +142,7 @@ public class Server {
             while (true) {
                 try (var socket = listener.accept()) {
                     var userInput = new Scanner(socket.getInputStream()).nextLine();
+                    refreshPoints();
 
                     if (userInput.equalsIgnoreCase("PLAYERS")) {
                         var out = new PrintWriter(socket.getOutputStream(), true);
@@ -117,6 +179,27 @@ public class Server {
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(playerStats(userInput.split(" ")[1]));
                         print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
+                    } else if (userInput.split(" ")[0].equalsIgnoreCase("BATTLE")) {
+                        clearScreen();
+
+                        String attacker = userInput.split(" ")[1];
+                        String defender = userInput.split(" ")[2];
+
+                        print("Battle happening between " + attacker + " and " + defender + "\n");
+                        print(attacker + " is attacking with " + playerStats(attacker));
+                        print(defender + " is defending with " + playerStats(attacker) + "\n");
+
+                        if (battle(attacker, defender)) {
+                            var out = new PrintWriter(socket.getOutputStream(), true);
+                            out.println("YOU WIN!");
+
+                        } else {
+                            var out = new PrintWriter(socket.getOutputStream(), true);
+                            out.println("YOU LOSE!");
+                        }
+
+                        print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
+                        print("Stats of user " + userInput.split(" ")[2] + " " + playerStats(userInput.split(" ")[2]));
                     }
                 }
             }

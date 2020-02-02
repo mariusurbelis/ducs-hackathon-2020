@@ -97,7 +97,7 @@ public class Client {
                 }
 
                 if (valid) {
-                    // Attack the player
+                    print(getData("BATTLE " + username + " " + chosenPlayer));
                 } else {
                     print("Player does not exist");
                 }
