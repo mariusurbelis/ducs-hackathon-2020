@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-public class DateServer {
+public class Server {
 
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
@@ -47,6 +47,23 @@ public class DateServer {
         return stats;
     }
 
+    public static void makeArmy(String army, int n, String user) {
+        for (Player p : players) {
+            if (p.username.equalsIgnoreCase(user)) {
+
+                if (army.equalsIgnoreCase("INF"))
+                    p.infantry += n;
+                else if (army.equalsIgnoreCase("ARC"))
+                    p.archers += n;
+                else if (army.equalsIgnoreCase("CAV"))
+                    p.cavalry += n;
+
+                p.actionPoints -= n;
+                return;
+            }
+        }
+    }
+
     public static ArrayList<Player> players = new ArrayList<Player>();
 
     public static String allPlayers() {
@@ -79,13 +96,24 @@ public class DateServer {
                         out.println("SUCCESS");
                         print("Registered user " + userInput.split(" ")[1]);
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("QUIT")) {
-                        removePlayer(userInput.split(" ")[1]);
+//                        removePlayer(userInput.split(" ")[1]);
                         clearScreen();
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println("BYE!");
                         print("Removed player " + userInput.split(" ")[1]);
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("INFO")) {
                         clearScreen();
+                        var out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println(playerStats(userInput.split(" ")[1]));
+                        print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
+                    } else if (userInput.split(" ")[0].equalsIgnoreCase("MAKE")) {
+                        clearScreen();
+
+                        int amount = Integer.parseInt(userInput.split(" ")[2]);
+                        String user = userInput.split(" ")[3];
+
+                        makeArmy(userInput.split(" ")[1], amount, user);
+
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(playerStats(userInput.split(" ")[1]));
                         print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));

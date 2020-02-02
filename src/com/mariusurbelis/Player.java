@@ -6,7 +6,7 @@ public class Player {
     }
 
     public String username;
-    public int actionPoints = 0;
+    public int actionPoints = 25;
     public int infantry = 0;
     public int archers = 0;
     public int cavalry = 0;

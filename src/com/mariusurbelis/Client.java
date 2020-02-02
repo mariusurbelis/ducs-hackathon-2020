@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.net.Socket;
 import java.io.IOException;
 
-public class DateClient {
+public class Client {
 
     public static String ip;
 
@@ -79,14 +79,30 @@ public class DateClient {
             print("1. ATTACK");
             print("2. MAKE <CAV, ARC, INF> NUMBER");
 
-            var command = playerIn.nextLine().split(" ")[0];
+            var command = playerIn.nextLine();
 
-            if (command.equalsIgnoreCase("ATTACK")) {
+            if (command.split(" ")[0].equalsIgnoreCase("ATTACK")) {
                 clearScreen();
                 print("Choose a player from the list:");
                 print(getData("PLAYERS"));
-            } else if (command.equalsIgnoreCase("MAKE")) {
-                print("attacking");
+            } else if (command.split(" ")[0].equalsIgnoreCase("MAKE")) {
+                String unit = command.split(" ")[1];
+
+                boolean valid = false;
+
+                if (unit.equalsIgnoreCase("INF") || unit.equalsIgnoreCase("ARC") || unit.equalsIgnoreCase("CAV"))
+                    valid = true;
+
+                if (valid) {
+                    var amount = Integer.parseInt(command.split(" ")[2]);
+
+                    print("SENT: " + command + " " + username);
+
+                    if (amount > points)
+                        print("You do not have enough action points");
+                    else
+                        print(getData(command + " " + username));
+                }
             }
 
             pause();
