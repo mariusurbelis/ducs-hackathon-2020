@@ -47,6 +47,16 @@ public class Server {
         return stats;
     }
 
+    public static String spy(String username) {
+        String stats = "";
+        for (Player p : players) {
+            if (p.username.equalsIgnoreCase(username)) {
+                stats += p.infantry + " " + p.archers + " " + p.cavalry;
+            }
+        }
+        return stats;
+    }
+
     public static void makeArmy(String army, int n, String user) {
         for (Player p : players) {
             if (p.username.equalsIgnoreCase(user)) {
@@ -117,6 +127,12 @@ public class Server {
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(playerStats(userInput.split(" ")[1]));
                         print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
+                    } else if (userInput.split(" ")[0].equalsIgnoreCase("SPY")) {
+                        clearScreen();
+
+                        var out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println(spy(userInput.split(" ")[1]));
+                        print("Army of user " + userInput.split(" ")[1] + " " + spy(userInput.split(" ")[1]));
                     }
                 }
             }
