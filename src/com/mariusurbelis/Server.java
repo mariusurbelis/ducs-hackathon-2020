@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
@@ -19,7 +20,13 @@ public class Server {
     }
 
     public static void print(String text) {
-        System.out.println(text);
+
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        System.out.println();
+
+
+        System.out.println(formatter.format(date) + "> " + text);
     }
 
     public static void removePlayer(String name) {
@@ -235,7 +242,7 @@ public class Server {
                         print("Stats of user " + userInput.split(" ")[2] + " " + playerStats(userInput.split(" ")[2]));
                     }
                 }
-                print("\n");
+//                print("\n");
             }
         }
     }
