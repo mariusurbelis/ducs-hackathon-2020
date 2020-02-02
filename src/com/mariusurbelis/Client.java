@@ -75,7 +75,9 @@ public class Client {
             print("Infantry: " + infantry + ", archers: " + archers + ", cavalry: " + cavalry + "\n");
             print("You can choose from a range of commands:");
             print("1. ATTACK");
-            print("2. MAKE <CAV, ARC, INF> NUMBER\n");
+            print("2. MAKE <INF, ARC, CAV> NUMBER (costs 1 action point per unit)");
+            print("3. TRANSFER (ability to transfer action points)");
+            print("4. SPY (costs 5 action points)\n");
 
             var command = playerIn.nextLine();
 
@@ -96,10 +98,14 @@ public class Client {
                     }
                 }
 
-                if (valid) {
-                    print(getData("BATTLE " + username + " " + chosenPlayer));
+                if (chosenPlayer.equalsIgnoreCase(username)) {
+                    print("You cannot attack yourself");
                 } else {
-                    print("Player does not exist");
+                    if (valid) {
+                        print(getData("BATTLE " + username + " " + chosenPlayer));
+                    } else {
+                        print("Player does not exist");
+                    }
                 }
 
             } else if (command.split(" ")[0].equalsIgnoreCase("MAKE")) {
@@ -138,12 +144,41 @@ public class Client {
                 }
 
                 if (valid) {
-                    // Spy the player
-                    print(getData(command + " " + username));
+                    print(getData(command.split(" ")[0] + " " + chosenPlayer));
                 } else {
                     print("Player does not exist");
                 }
+            } else if (command.split(" ")[0].equalsIgnoreCase("TRANSFER")) {
+                String players = getData("PLAYERS");
+                clearScreen();
+                print("Players in the game:");
+                print(players);
+                print("Your choice: ");
+
+                String playerInput = playerIn.nextLine();
+                String chosenPlayer = playerInput.split(" ")[0];
+                int amount = Integer.parseInt(playerInput.split(" ")[1]);
+
+                boolean validPlayer = false;
+
+                for(String s : players.split(" ")) {
+                    if (s.equalsIgnoreCase(chosenPlayer)) {
+                        validPlayer = true;
+                    }
+                }
+
+                if (amount > points) {
+                    print("You do not have enough points");
+                } else {
+                    if (validPlayer) {
+                        getData(command.split(" ")[0] + " " + username + " " + chosenPlayer + " " + amount);
+                        print(amount + " points transferred to " + chosenPlayer);
+                    } else {
+                        print("Player does not exist");
+                    }
+                }
             }
+
 
 
             pause();

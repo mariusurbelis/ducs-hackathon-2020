@@ -108,14 +108,23 @@ public class Server {
         return stats;
     }
 
+    public static void transferPoints(String userFrom, String userTo, int n) {
+        for(Player p : players) {
+            if (p.username.equalsIgnoreCase(userFrom))
+                p.actionPoints -= n;
+            if (p.username.equalsIgnoreCase(userTo))
+                p.actionPoints += n;
+        }
+    }
+
     public static String spy(String username) {
-        String stats = "";
         for (Player p : players) {
             if (p.username.equalsIgnoreCase(username)) {
-                stats += p.infantry + " " + p.archers + " " + p.cavalry;
+                p.actionPoints -= 5;
+                return "Player " + p.username + " has " + p.infantry + " infantry, " + p.archers + " archers and " + p.cavalry + " cavalry.";
             }
         }
-        return stats;
+        return null;
     }
 
     public static void makeArmy(String army, int n, String user) {
@@ -163,23 +172,23 @@ public class Server {
                         }
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("REGISTER")) {
                         addPlayer(userInput.split(" ")[1]);
-                        clearScreen();
+//                        clearScreen();
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println("SUCCESS");
                         print("Registered user " + userInput.split(" ")[1]);
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("QUIT")) {
 //                        removePlayer(userInput.split(" ")[1]);
-                        clearScreen();
+//                        clearScreen();
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println("BYE!");
                         print("Removed player " + userInput.split(" ")[1]);
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("INFO")) {
-                        clearScreen();
+//                        clearScreen();
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(playerStats(userInput.split(" ")[1]));
                         print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("MAKE")) {
-                        clearScreen();
+//                        clearScreen();
 
                         int amount = Integer.parseInt(userInput.split(" ")[2]);
                         String user = userInput.split(" ")[3];
@@ -190,13 +199,21 @@ public class Server {
                         out.println(playerStats(userInput.split(" ")[1]));
                         print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("SPY")) {
-                        clearScreen();
+//                        clearScreen();
 
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(spy(userInput.split(" ")[1]));
                         print("Army of user " + userInput.split(" ")[1] + " " + spy(userInput.split(" ")[1]));
+                    } else if (userInput.split(" ")[0].equalsIgnoreCase("TRANSFER")) {
+//                        clearScreen();
+
+                        transferPoints(userInput.split(" ")[1], userInput.split(" ")[2], Integer.parseInt(userInput.split(" ")[3]));
+
+                        var out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println(spy(userInput.split(" ")[1]));
+
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("BATTLE")) {
-                        clearScreen();
+//                        clearScreen();
 
                         String attacker = userInput.split(" ")[1];
                         String defender = userInput.split(" ")[2];
@@ -218,6 +235,7 @@ public class Server {
                         print("Stats of user " + userInput.split(" ")[2] + " " + playerStats(userInput.split(" ")[2]));
                     }
                 }
+                print("\n");
             }
         }
     }
