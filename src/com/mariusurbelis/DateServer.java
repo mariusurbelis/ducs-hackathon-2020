@@ -4,25 +4,92 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
 
-/**
- * A simple TCP server. When a client connects, it sends the client the current
- * datetime, then closes the connection. This is arguably the simplest server
- * you can write. Beware though that a client has to be completely served its
- * date before the server will be able to handle another client.
- */
 public class DateServer {
+
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    public static void print(String text) {
+        System.out.println(text);
+    }
+
+    public static void removePlayer(String name) {
+        for (Player p : players) {
+            if (p.username.equalsIgnoreCase(name)) {
+                players.remove(p);
+                return;
+            }
+        }
+    }
+
+    public static void addPlayer(String name) {
+        for (Player p : players) {
+            if (p.username.equalsIgnoreCase(name)) {
+                return;
+            }
+        }
+        players.add(new Player(name));
+    }
+
+    public static String playerStats(String username) {
+        String stats = "";
+        for (Player p : players) {
+            if (p.username.equalsIgnoreCase(username)) {
+                stats += p.actionPoints + " " + p.infantry + " " + p.archers + " " + p.cavalry;
+            }
+        }
+        return stats;
+    }
+
+    public static ArrayList<Player> players = new ArrayList<Player>();
+
+    public static String allPlayers() {
+        String playerString = "";
+        for (Player p : players) {
+            playerString += p.username + " ";
+        }
+        return playerString;
+    }
+
     public static void main(String[] args) throws IOException {
+
         try (var listener = new ServerSocket(59090)) {
-            System.out.println("The date server is running...");
+            System.out.println("The game server is running...");
             while (true) {
                 try (var socket = listener.accept()) {
-                    var out = new PrintWriter(socket.getOutputStream(), true);
-                    out.println(new Date().toString());
-                    out.println("Also, welcome to the text-based game server");
-                    out.println("Bye!");
-                    System.out.println("Someone actually connected and asked for the date lol");
+                    var userInput = new Scanner(socket.getInputStream()).nextLine();
+
+                    if (userInput.equalsIgnoreCase("PLAYERS")) {
+                        var out = new PrintWriter(socket.getOutputStream(), true);
+                        if (players.isEmpty()) {
+                            out.println("No players currently");
+                        } else {
+                            out.println(allPlayers());
+                        }
+                    } else if (userInput.split(" ")[0].equalsIgnoreCase("REGISTER")) {
+                        addPlayer(userInput.split(" ")[1]);
+                        clearScreen();
+                        var out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println("SUCCESS");
+                        print("Registered user " + userInput.split(" ")[1]);
+                    } else if (userInput.split(" ")[0].equalsIgnoreCase("QUIT")) {
+                        removePlayer(userInput.split(" ")[1]);
+                        clearScreen();
+                        var out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println("BYE!");
+                        print("Removed player " + userInput.split(" ")[1]);
+                    } else if (userInput.split(" ")[0].equalsIgnoreCase("INFO")) {
+                        clearScreen();
+                        var out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println(playerStats(userInput.split(" ")[1]));
+                        print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
+                    }
                 }
             }
         }

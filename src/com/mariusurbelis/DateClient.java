@@ -1,23 +1,95 @@
 package com.mariusurbelis;
 
+import java.io.PrintWriter;
+import java.util.Date;
 import java.util.Scanner;
 import java.net.Socket;
 import java.io.IOException;
 
-/**
- * A command line client for the date server. Requires the IP address of
- * the server as the sole argument. Exits after printing the response.
- */
 public class DateClient {
-    public static void main(String[] args) throws IOException {
-        if (args.length != 1) {
-            System.err.println("Pass the server IP as the sole command line argument");
-            return;
-        }
-        var socket = new Socket(args[0], 59090);
-        var in = new Scanner(socket.getInputStream());
 
-        while (in.hasNext())
-            System.out.println("Server response: " + in.nextLine());
+    public static String ip;
+
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    public static void print(String text) {
+        System.out.println(text);
+    }
+
+    public static void pause() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+
+        }
+    }
+
+    public static String getData(String command) throws IOException {
+        var socket = new Socket(ip, 59090);
+        var out = new PrintWriter(socket.getOutputStream(), true);
+        out.println(command);
+        return new Scanner(socket.getInputStream()).nextLine();
+    }
+
+    public static void main(String[] args) throws IOException {
+        int points = 0;
+        int infantry = 0;
+        int archers = 0;
+        int cavalry = 0;
+
+        if (args.length != 1) {
+            ip = "localhost";
+        } else {
+            ip = args[0];
+        }
+
+        var playerIn = new Scanner(System.in);
+
+        clearScreen();
+
+        System.out.print("Choose your username: ");
+        String username = new Scanner(System.in).nextLine();
+
+        username = username.replace(' ', '_');
+
+        clearScreen();
+
+        print(getData("REGISTER " + username));
+        print("Your chosen username is " + username);
+
+        pause();
+
+        while (true) {
+            clearScreen();
+
+            var stats = getData("INFO " + username);
+            points = Integer.parseInt(stats.split(" ")[0]);
+            infantry = Integer.parseInt(stats.split(" ")[1]);
+            archers = Integer.parseInt(stats.split(" ")[2]);
+            cavalry = Integer.parseInt(stats.split(" ")[3]);
+
+
+
+            print("You have " + points + " action points.");
+            print("Infantry: " + infantry + ", archers: " + archers + ", cavalry: " + cavalry + "\n");
+            print("You can choose from a range of commands:");
+            print("1. ATTACK");
+            print("2. MAKE <CAV, ARC, INF> NUMBER");
+
+            var command = playerIn.nextLine().split(" ")[0];
+
+            if (command.equalsIgnoreCase("ATTACK")) {
+                clearScreen();
+                print("Choose a player from the list:");
+                print(getData("PLAYERS"));
+            } else if (command.equalsIgnoreCase("MAKE")) {
+                print("attacking");
+            }
+
+            pause();
+        }
     }
 }
