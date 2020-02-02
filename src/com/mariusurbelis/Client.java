@@ -71,20 +71,37 @@ public class Client {
             archers = Integer.parseInt(stats.split(" ")[2]);
             cavalry = Integer.parseInt(stats.split(" ")[3]);
 
-
-
             print("You have " + points + " action points.");
             print("Infantry: " + infantry + ", archers: " + archers + ", cavalry: " + cavalry + "\n");
             print("You can choose from a range of commands:");
             print("1. ATTACK");
-            print("2. MAKE <CAV, ARC, INF> NUMBER");
+            print("2. MAKE <CAV, ARC, INF> NUMBER\n");
 
             var command = playerIn.nextLine();
 
             if (command.split(" ")[0].equalsIgnoreCase("ATTACK")) {
+                String players = getData("PLAYERS");
                 clearScreen();
                 print("Choose a player from the list:");
-                print(getData("PLAYERS"));
+                print(players);
+                print("Your choice: ");
+
+                String chosenPlayer = playerIn.nextLine();
+
+                boolean valid = false;
+
+                for(String s : players.split(" ")) {
+                    if (s.equalsIgnoreCase(chosenPlayer)) {
+                        valid = true;
+                    }
+                }
+
+                if (valid) {
+                    // Attack the player
+                } else {
+                    print("Player does not exist");
+                }
+
             } else if (command.split(" ")[0].equalsIgnoreCase("MAKE")) {
                 String unit = command.split(" ")[1];
 
