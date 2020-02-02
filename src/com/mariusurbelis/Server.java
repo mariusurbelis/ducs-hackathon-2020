@@ -182,7 +182,7 @@ public class Server {
 //                        clearScreen();
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println("SUCCESS");
-                        print("Registered user " + userInput.split(" ")[1]);
+                        print("User " + userInput.split(" ")[1] + " logged in");
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("QUIT")) {
 //                        removePlayer(userInput.split(" ")[1]);
 //                        clearScreen();
@@ -193,7 +193,7 @@ public class Server {
 //                        clearScreen();
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(playerStats(userInput.split(" ")[1]));
-                        print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
+//                        print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("MAKE")) {
 //                        clearScreen();
 
@@ -204,13 +204,13 @@ public class Server {
 
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(playerStats(userInput.split(" ")[1]));
-                        print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
+                        print("A user is making an army");
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("SPY")) {
 //                        clearScreen();
 
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(spy(userInput.split(" ")[1]));
-                        print("Army of user " + userInput.split(" ")[1] + " " + spy(userInput.split(" ")[1]));
+                        print("User " + userInput.split(" ")[1] + " is being spied");
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("TRANSFER")) {
 //                        clearScreen();
 
@@ -219,6 +219,8 @@ public class Server {
                         var out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(spy(userInput.split(" ")[1]));
 
+                        print("User " + userInput.split(" ")[1] + " transferred " + userInput.split(" ")[3] + " action points to " + userInput.split(" ")[2]);
+
                     } else if (userInput.split(" ")[0].equalsIgnoreCase("BATTLE")) {
 //                        clearScreen();
 
@@ -226,20 +228,18 @@ public class Server {
                         String defender = userInput.split(" ")[2];
 
                         print("Battle happening between " + attacker + " and " + defender + "\n");
-                        print(attacker + " is attacking with " + playerStats(attacker));
-                        print(defender + " is defending with " + playerStats(attacker) + "\n");
 
                         if (battle(attacker, defender)) {
                             var out = new PrintWriter(socket.getOutputStream(), true);
                             out.println("YOU WIN!");
+                            print(attacker + " wins");
 
                         } else {
                             var out = new PrintWriter(socket.getOutputStream(), true);
                             out.println("YOU LOSE!");
+                            print(defender + " wins");
                         }
 
-                        print("Stats of user " + userInput.split(" ")[1] + " " + playerStats(userInput.split(" ")[1]));
-                        print("Stats of user " + userInput.split(" ")[2] + " " + playerStats(userInput.split(" ")[2]));
                     }
                 }
 //                print("\n");
